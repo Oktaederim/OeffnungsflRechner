@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finaler Rechner für Öffnungsflächen</title>
+    <title>Finaler Rechner für Öffnungsflächen (mit Plausibilitätsprüfung)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,8 +227,8 @@
                     <li><strong>Klappe / Luke / Fenster:</strong> 3-seitige Öffnung. Formel: <code>A = x * (L + B)</code></li>
                     <li><strong>Tür:</strong> 2-seitige Öffnung (am Boden geschlossen). Formel: <code>A = x * (L + 0.5 * B)</code></li>
                 </ul>
-                <h4 class="mt-4">Hinweis zur Bedienung</h4>
-                <p>Die Zielfläche in Kasten 2 wird automatisch aus Kasten 1 aktualisiert. Wenn Sie die Zielfläche manuell ändern, wird diese Kopplung aufgehoben. Klicken Sie auf "Übernehmen", um die automatische Aktualisierung wieder zu aktivieren.</p>
+                <h4 class="mt-4 font-bold text-teal-300">Wichtiger Hinweis zur Fläche</h4>
+                <p>Die berechnete "geometrische Öffnungsfläche" ist die Summe der Flächen aller freien Seiten (vorne/hinten, links, rechts). Diese kann größer sein als die reine Bauteilfläche (Länge × Breite) der Klappe selbst. Der Rechner prüft, ob eine Zielfläche physikalisch überhaupt erreichbar ist.</p>
             </div>
         </details>
     </div>
@@ -257,8 +257,6 @@
         const altWarningEl = document.getElementById('altWarning');
         
         const resetBtn = document.getElementById('resetBtn');
-
-        // KORRIGIERT: Flag für manuelle Eingabe der Zielfläche
         let manualTargetArea = false;
 
         function calculate() {
@@ -299,7 +297,6 @@
             resultAreaCm2El.textContent = areaCm2.toFixed(2);
             resultAngleEl.textContent = isNaN(angleDeg) ? '---' : angleDeg.toFixed(2);
 
-            // KORRIGIERT: Zielfläche automatisch aktualisieren, wenn nicht manuell geändert
             if (!manualTargetArea) {
                 targetAreaM2El.value = areaM2.toFixed(4);
             }
@@ -322,9 +319,22 @@
                 alt_B_eff = Math.max(altLength, altWidth);
             }
             
-            let newOpeningDistance = 0;
             altWarningEl.textContent = '';
             
+            // NEU: Plausibilitätsprüfung
+            const maxAreaCm2 = (altType === 'hatch') 
+                ? alt_B_eff * (alt_L_eff + alt_B_eff) 
+                : alt_B_eff * (alt_L_eff + 0.5 * alt_B_eff);
+
+            if (targetAreaCm2 > maxAreaCm2 && maxAreaCm2 > 0) {
+                const maxAreaM2 = maxAreaCm2 / 10000;
+                altWarningEl.textContent = `Zielfläche > max. mögl. Fläche (${maxAreaM2.toFixed(2)} m²)!`;
+                altOpeningDistanceEl.textContent = '---';
+                altAngleEl.textContent = '---';
+                return; // Berechnung hier abbrechen
+            }
+
+            let newOpeningDistance = 0;
             let divisor;
             if (altType === 'hatch') {
                 divisor = alt_L_eff + alt_B_eff;
@@ -339,12 +349,8 @@
             let newAngleDeg = 0;
             if (alt_B_eff > 0 && newOpeningDistance <= alt_B_eff) {
                 newAngleDeg = Math.asin(newOpeningDistance / alt_B_eff) * (180 / Math.PI);
-            } else if (newOpeningDistance > alt_B_eff && alt_B_eff > 0) {
-                altWarningEl.textContent = 'Erforderliche Öffnungsweite wäre größer als die Klappentiefe!';
-                newAngleDeg = NaN;
-                newOpeningDistance = NaN;
             }
-
+            
             altOpeningDistanceEl.textContent = isNaN(newOpeningDistance) ? '---' : newOpeningDistance.toFixed(2);
             altAngleEl.textContent = isNaN(newAngleDeg) ? '---' : newAngleDeg.toFixed(2);
         }
@@ -361,23 +367,22 @@
             document.querySelector('input[name="altOpeningType"][value="hatch"]').checked = true;
             document.querySelector('input[name="altHingeAxis"][value="long"]').checked = true;
             
-            manualTargetArea = false; // Kopplung wiederherstellen
+            manualTargetArea = false;
             calculate();
         }
 
-        // KORRIGIERT: Event Listener für manuelle Eingabe der Zielfläche
         targetAreaM2El.addEventListener('input', () => {
             manualTargetArea = true;
-            calculate(); // Bei manueller Eingabe auch neu berechnen
+            calculate();
         });
 
         adoptAreaBtn.addEventListener('click', () => {
-            manualTargetArea = false; // Kopplung wiederherstellen
+            manualTargetArea = false;
             calculate();
         });
         
         allInputs.forEach(input => {
-            if (input.id !== 'targetAreaM2') { // Verhindert doppelte Listener
+            if (input.id !== 'targetAreaM2') {
                 input.addEventListener('input', calculate);
             }
         });
