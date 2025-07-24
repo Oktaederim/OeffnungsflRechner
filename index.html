@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finaler Rechner für Öffnungsflächen (mit Plausibilitätsprüfung)</title>
+    <title>Finaler Rechner für Öffnungsflächen (mit verbesserter Erklärung)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,30 +13,32 @@
             font-family: 'Inter', sans-serif;
         }
         .result-box {
-            background-color: #1f2937; /* bg-gray-800 */
-            border: 1px solid #4b5563; /* border-gray-600 */
+            background-color: #1f2937;
+            border: 1px solid #4b5563;
             border-radius: 0.5rem;
             padding: 1rem;
             margin-top: 1rem;
             transition: all 0.3s ease-in-out;
         }
         .result-value {
-            color: #2dd4bf; /* text-teal-400 */
+            color: #2dd4bf;
             font-weight: 700;
             font-size: 1.5rem;
         }
         .result-unit {
-            color: #9ca3af; /* text-gray-400 */
+            color: #9ca3af;
             font-size: 1rem;
             margin-left: 0.5rem;
         }
         .warning-text {
-            color: #facc15; /* text-yellow-400 */
+            color: #facc15;
             font-size: 0.875rem;
             min-height: 1.25rem;
+            display: flex;
+            align-items: center;
         }
         details {
-            background-color: #374151; /* bg-gray-700 */
+            background-color: #374151;
             border-radius: 0.5rem;
             margin-top: 1.5rem;
         }
@@ -48,13 +50,13 @@
         }
         .help-content {
             padding: 0 1rem 1rem 1rem;
-            border-top: 1px solid #4b5563; /* border-gray-600 */
+            border-top: 1px solid #4b5563;
             margin-top: 0.5rem;
         }
         .radio-group {
             display: flex;
             gap: 0.5rem;
-            background-color: #374151; /* bg-gray-700 */
+            background-color: #374151;
             padding: 0.25rem;
             border-radius: 0.5rem;
         }
@@ -64,10 +66,10 @@
             display: block;
             text-align: center;
             padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem; /* rounded-md */
+            border-radius: 0.375rem;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            color: #d1d5db; /* text-gray-300 */
+            color: #d1d5db;
             border: 2px solid transparent;
         }
         .radio-input {
@@ -77,13 +79,42 @@
             height: 0;
         }
         .radio-input:checked + .radio-label {
-            background-color: #14534e; /* bg-teal-800/50 */
-            color: #5eead4; /* text-teal-300 */
+            background-color: #14534e;
+            color: #5eead4;
             font-weight: 600;
-            border-color: #2dd4bf; /* border-teal-400 */
+            border-color: #2dd4bf;
         }
          .radio-input:focus-visible + .radio-label {
             box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px #2dd4bf;
+        }
+        /* NEU: Tooltip für Info-Icon */
+        .info-icon {
+            position: relative;
+            margin-left: 0.5rem;
+            cursor: help;
+        }
+        .info-tooltip {
+            visibility: hidden;
+            width: 280px;
+            background-color: #111827;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -140px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #4b5563;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .info-icon:hover .info-tooltip {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
@@ -222,20 +253,14 @@
             <summary>Erläuterungen und Berechnungs-Grundlagen</summary>
             <div class="help-content prose prose-invert max-w-none text-gray-300">
                 <p>Dieser Rechner ermittelt die geometrische Öffnungsfläche für gekippte Klappen und Türen und kann umgekehrt die nötige Öffnungsweite für eine Zielfläche berechnen.</p>
-                <h4 class="mt-4">Unterschied: Klappe vs. Tür</h4>
-                <ul class="list-disc list-inside">
-                    <li><strong>Klappe / Luke / Fenster:</strong> 3-seitige Öffnung. Formel: <code>A = x * (L + B)</code></li>
-                    <li><strong>Tür:</strong> 2-seitige Öffnung (am Boden geschlossen). Formel: <code>A = x * (L + 0.5 * B)</code></li>
-                </ul>
-                <h4 class="mt-4 font-bold text-teal-300">Wichtiger Hinweis zur Fläche</h4>
-                <p>Die berechnete "geometrische Öffnungsfläche" ist die Summe der Flächen aller freien Seiten (vorne/hinten, links, rechts). Diese kann größer sein als die reine Bauteilfläche (Länge × Breite) der Klappe selbst. Der Rechner prüft, ob eine Zielfläche physikalisch überhaupt erreichbar ist.</p>
+                <h4 class="mt-4 font-bold text-teal-300">Wichtiger Hinweis: Geometrische vs. Bauteil-Fläche</h4>
+                <p>Die berechnete "geometrische Öffnungsfläche" ist die Summe der Flächen aller freien Seiten (vorne/hinten, links, rechts). Diese ist für die Berechnung von Luft- und Rauchströmungen relevant und kann größer sein als die reine Bauteilfläche (Länge × Breite) der Klappe selbst. Der Rechner prüft, ob eine Zielfläche physikalisch überhaupt erreichbar ist.</p>
             </div>
         </details>
     </div>
 
     <script>
         const allInputs = document.querySelectorAll('input[type="number"], input[type="radio"]');
-        
         const lengthEl = document.getElementById('length');
         const widthEl = document.getElementById('width');
         const openingDistanceEl = document.getElementById('openingDistance');
@@ -245,7 +270,6 @@
         const resultAreaCm2El = document.getElementById('resultAreaCm2');
         const resultAngleEl = document.getElementById('resultAngle');
         const angleWarningEl = document.getElementById('angleWarning');
-
         const targetAreaM2El = document.getElementById('targetAreaM2');
         const adoptAreaBtn = document.getElementById('adoptAreaBtn');
         const altLengthEl = document.getElementById('altLength');
@@ -255,19 +279,17 @@
         const altOpeningDistanceEl = document.getElementById('altOpeningDistance');
         const altAngleEl = document.getElementById('altAngle');
         const altWarningEl = document.getElementById('altWarning');
-        
         const resetBtn = document.getElementById('resetBtn');
         let manualTargetArea = false;
 
         function calculate() {
-            // --- BERECHNUNG TEIL 1: HAUPTBERECHNUNG ---
             const length = parseFloat(lengthEl.value) || 0;
             const width = parseFloat(widthEl.value) || 0;
             const openingDistance = parseFloat(openingDistanceEl.value) || 0;
             const type = openingTypeEl();
             const hingeAxis = hingeAxisEl();
 
-            let L_eff, B_eff; 
+            let L_eff, B_eff;
             if (hingeAxis === 'long') {
                 L_eff = Math.max(length, width);
                 B_eff = Math.min(length, width);
@@ -276,12 +298,7 @@
                 B_eff = Math.max(length, width);
             }
 
-            let areaCm2 = 0;
-            if (type === 'hatch') {
-                areaCm2 = openingDistance * (L_eff + B_eff);
-            } else {
-                areaCm2 = openingDistance * (L_eff + 0.5 * B_eff);
-            }
+            let areaCm2 = (type === 'hatch') ? openingDistance * (L_eff + B_eff) : openingDistance * (L_eff + 0.5 * B_eff);
             const areaM2 = areaCm2 / 10000;
 
             let angleDeg = 0;
@@ -301,10 +318,8 @@
                 targetAreaM2El.value = areaM2.toFixed(4);
             }
 
-            // --- BERECHNUNG TEIL 2: ZIELWERT-BERECHNUNG ---
             const targetAreaM2 = parseFloat(targetAreaM2El.value) || 0;
             const targetAreaCm2 = targetAreaM2 * 10000;
-
             const altLength = parseFloat(altLengthEl.value) || 0;
             const altWidth = parseFloat(altWidthEl.value) || 0;
             const altType = altOpeningTypeEl();
@@ -318,31 +333,31 @@
                 alt_L_eff = Math.min(altLength, altWidth);
                 alt_B_eff = Math.max(altLength, altWidth);
             }
-            
-            altWarningEl.textContent = '';
-            
-            // NEU: Plausibilitätsprüfung
-            const maxAreaCm2 = (altType === 'hatch') 
-                ? alt_B_eff * (alt_L_eff + alt_B_eff) 
-                : alt_B_eff * (alt_L_eff + 0.5 * alt_B_eff);
 
+            altWarningEl.innerHTML = '';
+            
+            const maxAreaCm2 = (altType === 'hatch') ? alt_B_eff * (alt_L_eff + alt_B_eff) : alt_B_eff * (alt_L_eff + 0.5 * alt_B_eff);
+            
             if (targetAreaCm2 > maxAreaCm2 && maxAreaCm2 > 0) {
                 const maxAreaM2 = maxAreaCm2 / 10000;
-                altWarningEl.textContent = `Zielfläche > max. mögl. Fläche (${maxAreaM2.toFixed(2)} m²)!`;
+                const componentAreaM2 = (alt_L_eff * alt_B_eff) / 10000;
+                const sideAreaM2 = (altType === 'hatch') ? (alt_B_eff * alt_B_eff) / 10000 : (0.5 * alt_B_eff * alt_B_eff) / 10000;
+                
+                altWarningEl.innerHTML = `
+                    <span>Zielfläche > max. mögl. Fläche (${maxAreaM2.toFixed(2)} m²)</span>
+                    <div class="info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                        <span class="info-tooltip">Die max. geometrische Fläche (${maxAreaM2.toFixed(2)} m²) ist die Summe aus der vorderen Öffnung (${componentAreaM2.toFixed(2)} m²) und den seitlichen Öffnungen (${sideAreaM2.toFixed(2)} m²).</span>
+                    </div>`;
                 altOpeningDistanceEl.textContent = '---';
                 altAngleEl.textContent = '---';
-                return; // Berechnung hier abbrechen
+                return;
             }
 
             let newOpeningDistance = 0;
-            let divisor;
-            if (altType === 'hatch') {
-                divisor = alt_L_eff + alt_B_eff;
-            } else {
-                divisor = alt_L_eff + 0.5 * alt_B_eff;
-            }
+            let divisor = (altType === 'hatch') ? (alt_L_eff + alt_B_eff) : (alt_L_eff + 0.5 * alt_B_eff);
 
-            if (divisor > 0 && targetAreaCm2 > 0) {
+            if (divisor > 0 && targetAreaCm2 >= 0) {
                 newOpeningDistance = targetAreaCm2 / divisor;
             }
 
@@ -350,23 +365,21 @@
             if (alt_B_eff > 0 && newOpeningDistance <= alt_B_eff) {
                 newAngleDeg = Math.asin(newOpeningDistance / alt_B_eff) * (180 / Math.PI);
             }
-            
+
             altOpeningDistanceEl.textContent = isNaN(newOpeningDistance) ? '---' : newOpeningDistance.toFixed(2);
             altAngleEl.textContent = isNaN(newAngleDeg) ? '---' : newAngleDeg.toFixed(2);
         }
-        
+
         function resetAll() {
             lengthEl.value = '200';
             widthEl.value = '100';
             openingDistanceEl.value = '20';
             document.querySelector('input[name="openingType"][value="hatch"]').checked = true;
             document.querySelector('input[name="hingeAxis"][value="long"]').checked = true;
-
             altLengthEl.value = '100';
             altWidthEl.value = '60';
             document.querySelector('input[name="altOpeningType"][value="hatch"]').checked = true;
             document.querySelector('input[name="altHingeAxis"][value="long"]').checked = true;
-            
             manualTargetArea = false;
             calculate();
         }
@@ -380,15 +393,14 @@
             manualTargetArea = false;
             calculate();
         });
-        
+
         allInputs.forEach(input => {
             if (input.id !== 'targetAreaM2') {
                 input.addEventListener('input', calculate);
             }
         });
-        
-        resetBtn.addEventListener('click', resetAll);
 
+        resetBtn.addEventListener('click', resetAll);
         document.addEventListener('DOMContentLoaded', resetAll);
     </script>
 </body>
