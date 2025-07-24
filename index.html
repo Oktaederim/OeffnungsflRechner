@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rechner für geometrische Öffnungsflächen</title>
+    <title>Verbesserter Rechner für Öffnungsflächen</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,87 +51,107 @@
             border-top: 1px solid #4b5563; /* border-gray-600 */
             margin-top: 0.5rem;
         }
+        /* NEU: Styling für die Radio-Button-Schalter */
+        .radio-group {
+            display: flex;
+            gap: 0.5rem;
+            background-color: #374151; /* bg-gray-700 */
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+        }
+        .radio-label {
+            position: relative;
+            flex: 1;
+            display: block;
+            text-align: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            color: #d1d5db; /* text-gray-300 */
+            border: 2px solid transparent;
+        }
+        .radio-input {
+            opacity: 0;
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+        .radio-input:checked + .radio-label {
+            background-color: #14534e; /* bg-teal-800/50 */
+            color: #5eead4; /* text-teal-300 */
+            font-weight: 600;
+            border-color: #2dd4bf; /* border-teal-400 */
+        }
+         .radio-input:focus-visible + .radio-label {
+            box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px #2dd4bf;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white p-4 sm:p-6 md:p-8">
 
     <div class="max-w-4xl mx-auto">
-        <header class="text-center mb-8">
+        <header class="text-center mb-8 relative">
             <h1 class="text-3xl md:text-4xl font-bold text-teal-400">Öffnungsflächen-Rechner</h1>
             <p class="text-gray-400 mt-2">Für gekippte Klappen, Luken, Fenster und Türen (z.B. für RWA/Entrauchung)</p>
+            <!-- NEU: Reset Button -->
+            <button id="resetBtn" title="Alle Werte zurücksetzen" class="absolute top-0 right-0 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 border border-gray-600 rounded-lg shadow transition-colors">
+                Reset
+            </button>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Hauptberechnung -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col">
                 <h2 class="text-2xl font-semibold mb-4 border-b border-gray-600 pb-2">1. Hauptberechnung</h2>
+                <p class="text-gray-400 text-sm mb-4">Berechnet die Öffnungsfläche aus den Abmessungen.</p>
 
-                <!-- Typ der Öffnung -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Typ der Öffnung</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="openingType" value="hatch" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500" checked>
-                            <span class="ml-2">Klappe / Luke / Fenster</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="openingType" value="door" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500">
-                            <span class="ml-2">Tür</span>
-                        </label>
+                    <div class="radio-group">
+                        <label class="flex-1"><input type="radio" name="openingType" value="hatch" class="radio-input" checked><span class="radio-label">Klappe / Luke</span></label>
+                        <label class="flex-1"><input type="radio" name="openingType" value="door" class="radio-input"><span class="radio-label">Tür</span></label>
                     </div>
                 </div>
 
-                <!-- Abmessungen -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="length" class="block text-sm font-medium text-gray-300">Länge / Höhe (in cm)</label>
-                        <input type="number" id="length" value="200" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                        <label for="length" class="block text-sm font-medium text-gray-300">Länge / Höhe (cm)</label>
+                        <input type="number" id="length" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
                     </div>
                     <div>
-                        <label for="width" class="block text-sm font-medium text-gray-300">Breite / Tiefe (in cm)</label>
-                        <input type="number" id="width" value="100" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                        <label for="width" class="block text-sm font-medium text-gray-300">Breite / Tiefe (cm)</label>
+                        <input type="number" id="width" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
                     </div>
                 </div>
 
-                <!-- Kippachse -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Kippachse liegt an der...</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="hingeAxis" value="long" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500" checked>
-                            <span class="ml-2">Langen Seite</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="hingeAxis" value="short" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500">
-                            <span class="ml-2">Kurzen Seite</span>
-                        </label>
+                    <div class="radio-group">
+                        <label class="flex-1"><input type="radio" name="hingeAxis" value="long" class="radio-input" checked><span class="radio-label">Langen Seite</span></label>
+                        <label class="flex-1"><input type="radio" name="hingeAxis" value="short" class="radio-input"><span class="radio-label">Kurzen Seite</span></label>
                     </div>
                 </div>
 
-                <!-- Öffnungsweite -->
                 <div class="mb-4">
-                    <label for="openingDistance" class="block text-sm font-medium text-gray-300">Öffnungsweite 'x' (in cm)</label>
-                    <input type="number" id="openingDistance" value="20" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                    <label for="openingDistance" class="block text-sm font-medium text-gray-300">Öffnungsweite 'x' (cm)</label>
+                    <input type="number" id="openingDistance" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
                 </div>
                 
-                <!-- Ergebnisse -->
-                <div class="result-box">
+                <div class="result-box mt-auto">
                     <h3 class="text-lg font-semibold text-gray-200 mb-4">Ergebnisse:</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400">Fläche</label>
-                            <span id="resultAreaM2" class="result-value">0.00</span>
-                            <span class="result-unit">m²</span>
+                            <span id="resultAreaM2" class="result-value">0.00</span><span class="result-unit">m²</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400">Fläche</label>
-                            <span id="resultAreaCm2" class="result-value">0</span>
-                            <span class="result-unit">cm²</span>
+                            <span id="resultAreaCm2" class="result-value">0</span><span class="result-unit">cm²</span>
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-400">Öffnungswinkel</label>
-                            <span id="resultAngle" class="result-value">0.00</span>
-                            <span class="result-unit">°</span>
+                            <span id="resultAngle" class="result-value">0.00</span><span class="result-unit">°</span>
                             <p id="angleWarning" class="warning-text mt-1"></p>
                         </div>
                     </div>
@@ -139,65 +159,58 @@
             </div>
 
             <!-- Alternative Öffnung -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-600 pb-2">2. Alternative Öffnung</h2>
-                <p class="text-gray-400 text-sm mb-4">Berechnet die nötige Öffnungsweite einer alternativen Öffnung, um die oben berechnete Fläche zu erreichen.</p>
-
-                <!-- KORRIGIERT: Typ der Öffnung für Alternative hinzugefügt -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Typ der Öffnung</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="altOpeningType" value="hatch" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500" checked>
-                            <span class="ml-2">Klappe / Luke / Fenster</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="altOpeningType" value="door" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500">
-                            <span class="ml-2">Tür</span>
-                        </label>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col">
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-600 pb-2">2. Zielwert-Berechnung</h2>
+                <p class="text-gray-400 text-sm mb-4">Berechnet die Öffnungsweite für eine Zielfläche.</p>
+                
+                 <div class="mb-4">
+                    <label for="targetAreaM2" class="block text-sm font-medium text-gray-300">Zielfläche (m²)</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="targetAreaM2" step="0.01" class="flex-1 block w-full bg-gray-700 border-gray-600 rounded-none rounded-l-md focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                        <button id="adoptAreaBtn" type="button" class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-600 bg-gray-600 text-gray-300 hover:bg-gray-500 focus:outline-none focus:ring-1 focus:ring-teal-500">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
+                            <span class="ml-2 hidden sm:inline">Übernehmen</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Abmessungen Alternative -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Typ der alternativen Öffnung</label>
+                    <div class="radio-group">
+                        <label class="flex-1"><input type="radio" name="altOpeningType" value="hatch" class="radio-input" checked><span class="radio-label">Klappe / Luke</span></label>
+                        <label class="flex-1"><input type="radio" name="altOpeningType" value="door" class="radio-input"><span class="radio-label">Tür</span></label>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="altLength" class="block text-sm font-medium text-gray-300">Länge / Höhe (in cm)</label>
-                        <input type="number" id="altLength" value="100" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                        <label for="altLength" class="block text-sm font-medium text-gray-300">Länge / Höhe (cm)</label>
+                        <input type="number" id="altLength" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
                     </div>
                     <div>
-                        <label for="altWidth" class="block text-sm font-medium text-gray-300">Breite / Tiefe (in cm)</label>
-                        <input type="number" id="altWidth" value="60" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
+                        <label for="altWidth" class="block text-sm font-medium text-gray-300">Breite / Tiefe (cm)</label>
+                        <input type="number" id="altWidth" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-white p-2">
                     </div>
                 </div>
                 
-                <!-- Kippachse Alternative -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Kippachse liegt an der...</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="altHingeAxis" value="long" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500" checked>
-                            <span class="ml-2">Langen Seite</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="altHingeAxis" value="short" class="form-radio h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 focus:ring-teal-500">
-                            <span class="ml-2">Kurzen Seite</span>
-                        </label>
+                    <div class="radio-group">
+                        <label class="flex-1"><input type="radio" name="altHingeAxis" value="long" class="radio-input" checked><span class="radio-label">Langen Seite</span></label>
+                        <label class="flex-1"><input type="radio" name="altHingeAxis" value="short" class="radio-input"><span class="radio-label">Kurzen Seite</span></label>
                     </div>
                 </div>
 
-                <!-- Ergebnisse Alternative -->
-                <div class="result-box">
+                <div class="result-box mt-auto">
                     <h3 class="text-lg font-semibold text-gray-200 mb-4">Erforderliche Werte:</h3>
                      <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400">Öffnungsweite 'x'</label>
-                            <span id="altOpeningDistance" class="result-value">0.00</span>
-                            <span class="result-unit">cm</span>
+                            <span id="altOpeningDistance" class="result-value">0.00</span><span class="result-unit">cm</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400">Öffnungswinkel</label>
-                            <span id="altAngle" class="result-value">0.00</span>
-                            <span class="result-unit">°</span>
+                            <span id="altAngle" class="result-value">0.00</span><span class="result-unit">°</span>
                         </div>
                         <div class="col-span-2">
                              <p id="altWarning" class="warning-text mt-1"></p>
@@ -207,120 +220,109 @@
             </div>
         </div>
         
-        <!-- Erläuterungen -->
         <details>
             <summary>Erläuterungen und Berechnungs-Grundlagen</summary>
             <div class="help-content prose prose-invert max-w-none text-gray-300">
                 <h4>Funktionsweise des Rechners</h4>
-                <p>Dieser Rechner ermittelt die <strong>geometrische Öffnungsfläche</strong>, die entsteht, wenn eine rechteckige Fläche (Fenster, Klappe, Tür) gekippt wird. Diese Fläche ist relevant für die Planung von Rauch- und Wärmeabzugsanlagen (RWA) oder natürlichen Lüftungssystemen.</p>
-                
+                <ol class="list-decimal list-inside">
+                    <li><strong>Hauptberechnung:</strong> Ermittelt die geometrische Öffnungsfläche und den Winkel aus den Abmessungen und der Öffnungsweite einer Klappe oder Tür.</li>
+                    <li><strong>Zielwert-Berechnung:</strong> Ermittelt die notwendige Öffnungsweite und den Winkel für eine alternative Klappe/Tür, um eine vorgegebene <strong>Zielfläche</strong> zu erreichen. Diese Zielfläche kann entweder manuell eingegeben oder aus der Hauptberechnung übernommen werden.</li>
+                </ol>
                 <h4>Unterschied: Klappe vs. Tür</h4>
-                <ul>
+                <ul class="list-disc list-inside">
                     <li><strong>Klappe / Luke / Fenster:</strong> Es wird angenommen, dass die Öffnung an drei Seiten frei ist (die vierte Seite ist die Kippachse/das Scharnier). Die Gesamtfläche setzt sich aus der rechteckigen Frontöffnung und den beiden seitlichen dreieckigen Öffnungen zusammen.</li>
                     <li><strong>Tür:</strong> Es wird angenommen, dass die Tür am Boden aufsteht. Dadurch entfällt die untere Öffnung. Die Gesamtfläche besteht nur aus der seitlichen Öffnung und der oberen dreieckigen Öffnung.</li>
                 </ul>
-
                 <h4>Berechnungsformeln</h4>
-                <p>Die folgenden Variablen werden verwendet:</p>
-                <ul>
-                    <li><code>L</code>: Die Länge der Seite, an der die Kippachse liegt.</li>
-                    <li><code>B</code>: Die Länge der Seite, die sich von der Kippachse wegbewegt (Breite/Tiefe der Klappe).</li>
-                    <li><code>x</code>: Die Öffnungsweite; der senkrechte Abstand zwischen der bewegten Kante und der ursprünglichen Ebene.</li>
+                <p>Variablen: <code>L</code> = Länge der Kippachse, <code>B</code> = Tiefe der Öffnung (sich bewegende Seite), <code>x</code> = Öffnungsweite.</p>
+                <p><strong>Fläche (A):</strong></p>
+                <ul class="list-disc list-inside">
+                    <li>Für <strong>Klappe/Luke</strong>: <code>A = x * (L + B)</code></li>
+                    <li>Für <strong>Tür</strong>: <code>A = x * (L + 0.5 * B)</code></li>
                 </ul>
-
-                <p><strong>1. Fläche (A):</strong></p>
-                <ul>
-                    <li>Für <strong>Klappe/Luke</strong> (3 Öffnungen):<br><code>A = (L * x) + 2 * (0.5 * B * x) = x * (L + B)</code></li>
-                    <li>Für <strong>Tür</strong> (2 Öffnungen, L=Höhe, B=Breite):<br><code>A = (L * x) + (0.5 * B * x) = x * (L + 0.5 * B)</code></li>
+                <p><strong>Öffnungsweite (x) aus Zielfläche (A<sub>ziel</sub>):</strong></p>
+                <ul class="list-disc list-inside">
+                    <li>Für <strong>Klappe/Luke</strong>: <code>x = A<sub>ziel</sub> / (L + B)</code></li>
+                    <li>Für <strong>Tür</strong>: <code>x = A<sub>ziel</sub> / (L + 0.5 * B)</code></li>
                 </ul>
-
-                <p><strong>2. Öffnungswinkel (α):</strong></p>
-                <p>Der Winkel wird aus dem rechtwinkligen Dreieck gebildet, das durch die Klappenbreite <code>B</code> (Hypotenuse) und die Öffnungsweite <code>x</code> (Gegenkathete) aufgespannt wird.</p>
-                <code>α = arcsin(x / B)</code>
-                <p>Hinweis: Die Öffnungsweite <code>x</code> kann physikalisch nicht größer sein als die Breite/Tiefe <code>B</code> der Klappe.</p>
-
-                <p><strong>Haftungsausschluss:</strong> Die hier berechnete geometrische Fläche kann von der aerodynamisch wirksamen Fläche abweichen. Für normative Nachweise (z.B. nach DIN 18232, EN 12101) sind ggf. Durchflussbeiwerte (C<sub>v</sub>) zu berücksichtigen. Dieser Rechner dient als Planungs- und Verständnishilfe.</p>
+                <p><strong>Öffnungswinkel (α):</strong> <code>α = arcsin(x / B)</code></p>
+                <p><strong>Haftungsausschluss:</strong> Die hier berechnete geometrische Fläche kann von der aerodynamisch wirksamen Fläche abweichen. Für normative Nachweise sind ggf. Durchflussbeiwerte (C<sub>v</sub>) zu berücksichtigen. Dieser Rechner dient als Planungs- und Verständnishilfe.</p>
             </div>
         </details>
     </div>
 
     <script>
-        // DOM-Elemente abrufen
-        const inputs = document.querySelectorAll('input[type="number"], input[type="radio"]');
-
+        const allInputs = document.querySelectorAll('input[type="number"], input[type="radio"]');
+        
+        // Block 1: Hauptberechnung
         const lengthEl = document.getElementById('length');
         const widthEl = document.getElementById('width');
         const openingDistanceEl = document.getElementById('openingDistance');
         const openingTypeEl = () => document.querySelector('input[name="openingType"]:checked').value;
         const hingeAxisEl = () => document.querySelector('input[name="hingeAxis"]:checked').value;
-
         const resultAreaM2El = document.getElementById('resultAreaM2');
         const resultAreaCm2El = document.getElementById('resultAreaCm2');
         const resultAngleEl = document.getElementById('resultAngle');
         const angleWarningEl = document.getElementById('angleWarning');
 
+        // Block 2: Zielwert-Berechnung
+        const targetAreaM2El = document.getElementById('targetAreaM2');
+        const adoptAreaBtn = document.getElementById('adoptAreaBtn');
         const altLengthEl = document.getElementById('altLength');
         const altWidthEl = document.getElementById('altWidth');
-        // KORRIGIERT: Funktion zum Abrufen des alternativen Öffnungstyps hinzugefügt
         const altOpeningTypeEl = () => document.querySelector('input[name="altOpeningType"]:checked').value;
         const altHingeAxisEl = () => document.querySelector('input[name="altHingeAxis"]:checked').value;
-        
         const altOpeningDistanceEl = document.getElementById('altOpeningDistance');
         const altAngleEl = document.getElementById('altAngle');
         const altWarningEl = document.getElementById('altWarning');
+        
+        // NEU: Reset Button
+        const resetBtn = document.getElementById('resetBtn');
 
-        // Haupt-Berechnungsfunktion
         function calculate() {
-            // 1. Werte aus dem Formular lesen und in Zahlen umwandeln (in cm)
+            // --- BERECHNUNG TEIL 1: HAUPTBERECHNUNG ---
             const length = parseFloat(lengthEl.value) || 0;
             const width = parseFloat(widthEl.value) || 0;
             const openingDistance = parseFloat(openingDistanceEl.value) || 0;
             const type = openingTypeEl();
             const hingeAxis = hingeAxisEl();
 
-            // Variablen für die effektiven Seiten basierend auf der Kippachse
             let L_eff, B_eff; 
-
             if (hingeAxis === 'long') {
-                L_eff = Math.max(length, width); // Kippachse ist die längere Seite
-                B_eff = Math.min(length, width); // Öffnungsseite ist die kürzere Seite
+                L_eff = Math.max(length, width);
+                B_eff = Math.min(length, width);
             } else {
-                L_eff = Math.min(length, width); // Kippachse ist die kürzere Seite
-                B_eff = Math.max(length, width); // Öffnungsseite ist die längere Seite
+                L_eff = Math.min(length, width);
+                B_eff = Math.max(length, width);
             }
 
-            // --- BERECHNUNG TEIL 1: HAUPTBERECHNUNG ---
             let areaCm2 = 0;
             if (type === 'hatch') {
-                // Formel für Klappe/Luke: A = x * (L + B)
                 areaCm2 = openingDistance * (L_eff + B_eff);
             } else { // type === 'door'
-                // Formel für Tür: A = x * (L + 0.5 * B)
                 areaCm2 = openingDistance * (L_eff + 0.5 * B_eff);
             }
-
             const areaM2 = areaCm2 / 10000;
 
-            // Winkelberechnung
             let angleDeg = 0;
             angleWarningEl.textContent = '';
             if (B_eff > 0 && openingDistance <= B_eff) {
-                const angleRad = Math.asin(openingDistance / B_eff);
-                angleDeg = angleRad * (180 / Math.PI);
+                angleDeg = Math.asin(openingDistance / B_eff) * (180 / Math.PI);
             } else if (openingDistance > B_eff && B_eff > 0) {
                 angleWarningEl.textContent = 'Öffnungsweite > Klappentiefe!';
                 angleDeg = NaN;
             }
 
-            // Ergebnisse anzeigen
             resultAreaM2El.textContent = areaM2.toFixed(4);
             resultAreaCm2El.textContent = areaCm2.toFixed(2);
             resultAngleEl.textContent = isNaN(angleDeg) ? '---' : angleDeg.toFixed(2);
 
-            // --- BERECHNUNG TEIL 2: ALTERNATIVE ÖFFNUNG ---
+            // --- BERECHNUNG TEIL 2: ZIELWERT-BERECHNUNG ---
+            const targetAreaM2 = parseFloat(targetAreaM2El.value) || 0;
+            const targetAreaCm2 = targetAreaM2 * 10000;
+
             const altLength = parseFloat(altLengthEl.value) || 0;
             const altWidth = parseFloat(altWidthEl.value) || 0;
-            // KORRIGIERT: Wert des alternativen Öffnungstyps abrufen
             const altType = altOpeningTypeEl();
             const altHingeAxis = altHingeAxisEl();
 
@@ -336,7 +338,6 @@
             let newOpeningDistance = 0;
             altWarningEl.textContent = '';
             
-            // KORRIGIERT: Divisor basierend auf dem alternativen Öffnungstyp berechnen
             let divisor;
             if (altType === 'hatch') {
                 divisor = alt_L_eff + alt_B_eff;
@@ -344,31 +345,58 @@
                 divisor = alt_L_eff + 0.5 * alt_B_eff;
             }
 
-            if (divisor > 0 && areaCm2 > 0) {
-                newOpeningDistance = areaCm2 / divisor;
+            if (divisor > 0 && targetAreaCm2 > 0) {
+                newOpeningDistance = targetAreaCm2 / divisor;
             }
 
             let newAngleDeg = 0;
             if (alt_B_eff > 0 && newOpeningDistance <= alt_B_eff) {
-                const newAngleRad = Math.asin(newOpeningDistance / alt_B_eff);
-                newAngleDeg = newAngleRad * (180 / Math.PI);
+                newAngleDeg = Math.asin(newOpeningDistance / alt_B_eff) * (180 / Math.PI);
             } else if (newOpeningDistance > alt_B_eff && alt_B_eff > 0) {
                 altWarningEl.textContent = 'Erforderliche Öffnungsweite wäre größer als die Klappentiefe!';
                 newAngleDeg = NaN;
                 newOpeningDistance = NaN;
             }
 
-            // Ergebnisse für Alternative anzeigen
             altOpeningDistanceEl.textContent = isNaN(newOpeningDistance) ? '---' : newOpeningDistance.toFixed(2);
             altAngleEl.textContent = isNaN(newAngleDeg) ? '---' : newAngleDeg.toFixed(2);
         }
-
-        // Event Listener für alle Eingabefelder hinzufügen, um bei jeder Änderung neu zu berechnen
-        inputs.forEach(input => input.addEventListener('input', calculate));
         
-        // Initiale Berechnung beim Laden der Seite durchführen
-        document.addEventListener('DOMContentLoaded', calculate);
+        // NEU: Funktion zum Zurücksetzen aller Werte
+        function resetAll() {
+            // Standardwerte für Block 1
+            lengthEl.value = '200';
+            widthEl.value = '100';
+            openingDistanceEl.value = '20';
+            document.querySelector('input[name="openingType"][value="hatch"]').checked = true;
+            document.querySelector('input[name="hingeAxis"][value="long"]').checked = true;
 
+            // Standardwerte für Block 2
+            altLengthEl.value = '100';
+            altWidthEl.value = '60';
+            document.querySelector('input[name="altOpeningType"][value="hatch"]').checked = true;
+            document.querySelector('input[name="altHingeAxis"][value="long"]').checked = true;
+            
+            // Neuberechnung auslösen und Zielfeld aktualisieren
+            calculate();
+            adoptAreaBtn.click();
+        }
+
+        // Event Listener für "Fläche übernehmen"-Button
+        adoptAreaBtn.addEventListener('click', () => {
+            const areaFromCalc1 = parseFloat(resultAreaM2El.textContent) || 0;
+            targetAreaM2El.value = areaFromCalc1.toFixed(4);
+            calculate();
+        });
+        
+        // Event Listener für alle Eingabefelder
+        allInputs.forEach(input => input.addEventListener('input', calculate));
+        
+        // Event Listener für Reset-Button
+        resetBtn.addEventListener('click', resetAll);
+
+        // Initiale Berechnung beim Laden der Seite
+        document.addEventListener('DOMContentLoaded', resetAll);
     </script>
 </body>
 </html>
